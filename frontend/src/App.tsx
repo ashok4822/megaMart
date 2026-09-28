@@ -24,7 +24,7 @@ const CartPage = lazy(() =>
   import("./pages/cart/CartPage").then((m) => ({ default: m.CartPage })),
 );
 const AuthPage = lazy(() =>
-  import("./pages/auth/AuthPage.ts").then((m) => ({ default: m.AuthPage })),
+  import("./pages/auth/AuthPage").then((m) => ({ default: m.AuthPage })),
 );
 
 const PageLoader: React.FC = () => (

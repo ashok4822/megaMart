@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/useAppDispatch';
 import { fetchProducts, setFilters, setPage } from '../../store/slices/productSlice';
@@ -21,28 +21,24 @@ export const ProductListPage: React.FC = () => {
   const categoryParam = searchParams.get('category') || '';
   const qParam = searchParams.get('q') || '';
 
-  const loadProducts = useCallback(() => {
+  // Single source of truth: derive active filters from URL params + Redux filters,
+  // then fetch whenever any of them change.
+  useEffect(() => {
     dispatch(fetchProducts({
       ...filters,
-      category: categoryParam || filters.category,
-      q: qParam || filters.q,
+      category: categoryParam,
+      q: qParam,
     }));
-  }, [dispatch, filters, categoryParam, qParam]);
-
-  useEffect(() => {
-    if (categoryParam) dispatch(setFilters({ category: categoryParam, q: '' }));
-    else if (qParam) dispatch(setFilters({ q: qParam, category: '' }));
-  }, [categoryParam, qParam, dispatch]);
-
-  useEffect(() => {
-    loadProducts();
-  }, [filters]);
+  }, [categoryParam, qParam, filters.sort, filters.minPrice, filters.maxPrice, filters.page, filters.limit]);
 
   const handleCategoryChange = (cat: string) => {
     const newParams: Record<string, string> = {};
     if (cat && cat !== 'All') newParams.category = cat;
+    // Preserve search query if present
+    if (qParam) newParams.q = qParam;
     setSearchParams(newParams);
-    dispatch(setFilters({ category: cat === 'All' ? '' : cat, q: '', page: 1 }));
+    // Reset page when category changes
+    dispatch(setFilters({ page: 1 }));
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -50,10 +46,14 @@ export const ProductListPage: React.FC = () => {
   };
 
   const handlePriceFilter = (min?: number, max?: number) => {
-    dispatch(setFilters({ minPrice: min, maxPrice: max }));
+    dispatch(setFilters({ minPrice: min, maxPrice: max, page: 1 }));
   };
 
-  const activeCategory = categoryParam || filters.category || '';
+  const loadProducts = () => {
+    dispatch(fetchProducts({ ...filters, category: categoryParam, q: qParam }));
+  };
+
+  const activeCategory = categoryParam;
 
   return (
     <main className="plp" id="product-list-page">
@@ -119,7 +119,7 @@ export const ProductListPage: React.FC = () => {
               </div>
             </div>
 
-            {(filters.category || filters.minPrice || filters.maxPrice || filters.q) && (
+            {(categoryParam || qParam || filters.minPrice || filters.maxPrice) && (
               <button
                 id="clear-filters-btn"
                 className="btn btn-ghost btn-full"
