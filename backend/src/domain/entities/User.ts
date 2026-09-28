@@ -4,12 +4,12 @@ export interface User {
   email: string;
   password: string;
   role: "user" | "admin";
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface UserPublic {
-  _is: string;
+  _id: string;
   name: string;
   email: string;
   role: "user" | "admin";
