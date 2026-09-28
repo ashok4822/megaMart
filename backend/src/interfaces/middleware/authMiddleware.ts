@@ -1,8 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
+import type { ParamsDictionary } from "express-serve-static-core";
 import jwt from "jsonwebtoken";
 import { AppError } from "../../shared/errors/AppError.js";
 
-export interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest<
+  P extends ParamsDictionary = ParamsDictionary,
+> extends Request<P> {
   user?: {
     userId: string;
     role: string;

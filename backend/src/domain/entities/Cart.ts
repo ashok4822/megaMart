@@ -4,7 +4,7 @@ export interface CartItem {
   variantSku: string;
   quantity: number;
   priceAtAdd: number; // Price snapshot at time of adding
-  productSnapShot?: {
+  productSnapshot?: {
     name: string;
     image: string;
     slug: string;
