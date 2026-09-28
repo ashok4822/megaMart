@@ -1,0 +1,181 @@
+.pdp { padding: 24px 0 48px; min-height: 80vh; }
+
+.pdp__breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text-muted); margin-bottom: 24px;
+}
+.pdp__breadcrumb a { color: var(--primary); text-decoration: none; }
+.pdp__breadcrumb a:hover { text-decoration: underline; }
+.pdp__breadcrumb-current {
+  max-width: 300px; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.pdp__layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* Gallery */
+.pdp__gallery { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 136px; }
+
+.pdp__main-image-wrap {
+  position: relative;
+  background: var(--bg-section);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.pdp__main-image {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  padding: 24px;
+  transition: transform 400ms ease;
+}
+.pdp__main-image-wrap:hover .pdp__main-image { transform: scale(1.08); }
+
+.pdp__thumbnails { display: flex; gap: 8px; overflow-x: auto; }
+.pdp__thumb {
+  width: 72px; height: 72px; flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  overflow: hidden; cursor: pointer;
+  background: var(--bg-section);
+  padding: 0;
+  transition: border-color var(--transition);
+}
+.pdp__thumb img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+.pdp__thumb--active { border-color: var(--primary); }
+.pdp__thumb:hover { border-color: var(--primary); }
+
+/* Info */
+.pdp__info { display: flex; flex-direction: column; gap: 20px; }
+
+.pdp__brand {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.pdp__title {
+  font-size: 26px; font-weight: 800;
+  color: var(--text-primary); line-height: 1.3;
+}
+
+/* Pricing */
+.pdp__price-section {
+  padding: 20px;
+  background: var(--bg-section);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.pdp__price-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.pdp__price-current { font-size: 32px; font-weight: 800; color: var(--text-primary); }
+.pdp__price-original { font-size: 18px; color: var(--text-muted); text-decoration: line-through; }
+.pdp__price-save { font-size: 14px; font-weight: 600; color: var(--success); margin-bottom: 10px; }
+
+.pdp__stock { font-size: 14px; font-weight: 600; }
+.pdp__stock--in { color: var(--success); }
+.pdp__stock--low { color: var(--warning); }
+.pdp__stock--out { color: var(--danger); }
+
+/* Variants */
+.pdp__variants { display: flex; flex-direction: column; gap: 10px; }
+.pdp__variants-label { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+.pdp__variant-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.pdp__variant-btn {
+  padding: 8px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: white;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; color: var(--text-primary);
+  transition: all var(--transition);
+}
+.pdp__variant-btn:hover { border-color: var(--primary); color: var(--primary); }
+.pdp__variant-btn--active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 600;
+}
+.pdp__variant-btn--oos {
+  opacity: 0.45; text-decoration: line-through; cursor: not-allowed;
+}
+
+/* Qty */
+.pdp__qty { display: flex; flex-direction: column; gap: 10px; }
+.pdp__qty-controls { display: flex; align-items: center; gap: 0; border: 1.5px solid var(--border); border-radius: var(--radius-sm); width: fit-content; overflow: hidden; }
+.pdp__qty-btn {
+  width: 40px; height: 40px;
+  border: none; background: var(--bg-section);
+  font-size: 20px; font-weight: 600;
+  cursor: pointer; color: var(--text-primary);
+  transition: background var(--transition);
+  display: flex; align-items: center; justify-content: center;
+}
+.pdp__qty-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+.pdp__qty-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pdp__qty-value {
+  min-width: 48px; text-align: center;
+  font-size: 16px; font-weight: 700;
+  border-left: 1.5px solid var(--border);
+  border-right: 1.5px solid var(--border);
+  padding: 0 8px; line-height: 40px;
+}
+
+/* Actions */
+.pdp__actions { display: flex; gap: 12px; }
+.pdp__add-btn { flex: 1; font-size: 16px; padding: 14px; }
+
+/* Description */
+.pdp__description {
+  padding: 20px;
+  background: var(--bg-section);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.pdp__description h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+.pdp__description p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+
+/* Tags */
+.pdp__tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.pdp__tag {
+  padding: 4px 12px;
+  background: var(--bg-section);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all var(--transition);
+}
+.pdp__tag:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+
+/* Skeleton */
+.pdp--loading .container { min-height: 80vh; }
+.pdp__skeleton { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 24px 0; }
+.pdp__img-skeleton { aspect-ratio: 1; border-radius: var(--radius-lg); }
+.pdp__content-skeleton { display: flex; flex-direction: column; }
+
+@media (max-width: 900px) {
+  .pdp__layout { grid-template-columns: 1fr; }
+  .pdp__gallery { position: static; }
+  .pdp__skeleton { grid-template-columns: 1fr; }
+  .pdp__price-current { font-size: 26px; }
+}
+
+@media (max-width: 480px) {
+  .pdp__title { font-size: 20px; }
+  .pdp__add-btn { font-size: 14px; padding: 12px; }
+}
