@@ -19,13 +19,20 @@ export function authenticate(
   _res: Response,
   next: NextFunction,
 ): void {
-  const authHeader = req.headers.authorization;
+  // 1. Prefer HttpOnly cookie
+  let token: string | undefined = req.cookies?.megamart_token;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return next(new AppError("Authentication required", 401));
+  // 2. Fallback: Authorization: Bearer <token> header (for mobile / API clients)
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader?.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    }
   }
 
-  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return next(new AppError("Authentication required", 401));
+  }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as {

@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
+import cookieParser from "cookie-parser";
 
 // Infrastructure
 import { MongoProductRepository } from "./infrastructure/repositories/MongoProductRepository.js";
@@ -106,6 +107,9 @@ export function createApp() {
   // Body parsing
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+
+  // Cookie parsing (needed to read HttpOnly JWT cookie)
+  app.use(cookieParser());
 
   // Logging
   if (process.env.NODE_ENV !== "test") {
