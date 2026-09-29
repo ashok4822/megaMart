@@ -10,5 +10,8 @@ export function createAuthRouter(controller: AuthController): Router {
   // POST /api/auth/login
   router.post("/login", controller.login);
 
+  // POST /api/auth/logout  – clears the HttpOnly cookie
+  router.post("/logout", controller.logout);
+
   return router;
 }

@@ -1,21 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/axiosInstance";
-import type { User, AuthTokens } from "../../types";
+import type { User } from "../../types";
 
 interface AuthState {
   user: User | null;
-  token: string | null;
   loading: boolean;
   error: string | null;
 }
 
-// Rehydrate from localStorage
-const storedToken = localStorage.getItem("megamart_token");
-const storedUser = localStorage.getItem("megamart_user");
+// Rehydrate user from sessionStorage (lightweight – no token stored client-side)
+const storedUser = sessionStorage.getItem("megamart_user");
 
 const initialState: AuthState = {
   user: storedUser ? JSON.parse(storedUser) : null,
-  token: storedToken || null,
   loading: false,
   error: null,
 };
@@ -29,11 +26,12 @@ export const registerUser = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
-      const { data } = await api.post<{ success: boolean; data: AuthTokens }>(
+      // Server sets HttpOnly cookie; response only contains user info
+      const { data } = await api.post<{ success: boolean; data: { user: User } }>(
         "/auth/register",
         payload,
       );
-      return data.data;
+      return data.data.user;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(
@@ -47,11 +45,12 @@ export const loginUser = createAsyncThunk(
   "auth/login",
   async (payload: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      const { data } = await api.post<{ success: boolean; data: AuthTokens }>(
+      // Server sets HttpOnly cookie; response only contains user info
+      const { data } = await api.post<{ success: boolean; data: { user: User } }>(
         "/auth/login",
         payload,
       );
-      return data.data;
+      return data.data.user;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(error.response?.data?.message || "Login failed");
@@ -59,18 +58,17 @@ export const loginUser = createAsyncThunk(
   },
 );
 
+export const logoutUser = createAsyncThunk("auth/logout", async () => {
+  // Ask the server to clear the HttpOnly cookie
+  await api.post("/auth/logout");
+});
+
 // ── Slice ─────────────────────────────────────────────────
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    logout(state) {
-      state.user = null;
-      state.token = null;
-      localStorage.removeItem("megamart_token");
-      localStorage.removeItem("megamart_user");
-    },
     clearError(state) {
       state.error = null;
     },
@@ -80,33 +78,38 @@ const authSlice = createSlice({
       state.loading = true;
       state.error = null;
     };
-    const handleFulfilled = (
-      state: AuthState,
-      action: { payload: AuthTokens },
-    ) => {
-      state.loading = false;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      localStorage.setItem("megamart_token", action.payload.token);
-      localStorage.setItem(
-        "megamart_user",
-        JSON.stringify(action.payload.user),
-      );
-    };
     const handleRejected = (state: AuthState, action: { payload: unknown }) => {
       state.loading = false;
       state.error = action.payload as string;
     };
 
     builder
+      // Register
       .addCase(registerUser.pending, handlePending)
-      .addCase(registerUser.fulfilled, handleFulfilled)
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        // Only persist non-sensitive user info (no token!)
+        sessionStorage.setItem("megamart_user", JSON.stringify(action.payload));
+      })
       .addCase(registerUser.rejected, handleRejected)
+
+      // Login
       .addCase(loginUser.pending, handlePending)
-      .addCase(loginUser.fulfilled, handleFulfilled)
-      .addCase(loginUser.rejected, handleRejected);
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        sessionStorage.setItem("megamart_user", JSON.stringify(action.payload));
+      })
+      .addCase(loginUser.rejected, handleRejected)
+
+      // Logout
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        sessionStorage.removeItem("megamart_user");
+      });
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { clearError } = authSlice.actions;
 export default authSlice.reducer;

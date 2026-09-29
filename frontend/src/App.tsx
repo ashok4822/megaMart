@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { store } from "./store";
 import { Header } from "./components/layout/Header";
 import { Footer } from "./components/layout/Footer";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // Lazy-loaded pages
 const HomePage = lazy(() =>
@@ -44,18 +45,21 @@ const AppLayout: React.FC = () => (
   <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
     <Header />
     <div style={{ flex: 1 }}>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/products" element={<ProductListPage />} />
-          <Route path="/products/:slug" element={<ProductDetailPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/auth/login" element={<AuthPage />} />
-          <Route path="/auth/register" element={<AuthPage />} />
-          {/* Catch-all */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
+      {/* Route-level boundary: errors stay within the content area, header/footer survive */}
+      <ErrorBoundary scope="Page">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/products" element={<ProductListPage />} />
+            <Route path="/products/:slug" element={<ProductDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/auth/login" element={<AuthPage />} />
+            <Route path="/auth/register" element={<AuthPage />} />
+            {/* Catch-all */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
     </div>
     <Footer />
   </div>
@@ -64,7 +68,10 @@ const AppLayout: React.FC = () => (
 const App: React.FC = () => (
   <Provider store={store}>
     <BrowserRouter>
-      <AppLayout />
+      {/* Root-level boundary: last resort catch-all for the entire app */}
+      <ErrorBoundary scope="App">
+        <AppLayout />
+      </ErrorBoundary>
       <Toaster
         position="top-right"
         toastOptions={{
